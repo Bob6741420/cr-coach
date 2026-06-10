@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CR Coach</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+
+  <!-- Landing Page -->
+  <div id="landing" class="min-h-screen bg-gradient-to-b from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center">
+    <div class="text-center space-y-8 px-6 max-w-xl">
+      <div class="space-y-3">
+        <h1 class="text-6xl font-black text-white tracking-tight">CR Coach</h1>
+        <p class="text-blue-200 text-xl">Enter your tag. See exactly what's beating you — and why.</p>
+      </div>
+      <form onsubmit="search(event)" class="flex justify-center gap-2">
+        <input
+          id="tagInput"
+          placeholder="#ABC123"
+          class="border-2 border-white/30 bg-white/10 text-white placeholder-white/50 rounded-lg px-4 py-3 text-lg w-56 font-mono focus:outline-none focus:border-white/60"
+        />
+        <button type="submit" class="bg-white text-blue-900 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 transition-colors">
+          Analyze
+        </button>
+      </form>
+      <div class="flex justify-center gap-8 text-sm text-blue-300">
+        <span>✓ Free preview</span>
+        <span>✓ Real battle data</span>
+        <span>✓ Full dashboard $4.99/mo</span>
+      </div>
+      <p class="text-blue-400 text-xs">
+        Don't know your tag? Find it in-game (tap your profile) or search your name on
+        <a href="https://royaleapi.com" target="_blank" class="underline hover:text-white">royaleapi.com</a>
+        — if multiple accounts show up, use your trophy count to pick the right one.
+      </p>
+    </div>
+  </div>
+
+  <!-- Player Page (hidden by default) -->
+  <div id="playerPage" class="hidden min-h-screen bg-gray-50 p-6">
+    <div class="max-w-3xl mx-auto space-y-6">
+
+      <!-- Header -->
+      <div class="flex items-start justify-between">
+        <div>
+          <h1 id="playerName" class="text-3xl font-black text-gray-900">PlayerName</h1>
+          <p id="playerMeta" class="text-gray-400 text-sm mt-1">Arena · #TAG</p>
+        </div>
+        <button onclick="goBack()" class="text-sm text-gray-400 hover:text-gray-600">← Search again</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div class="bg-white rounded-xl p-4 shadow-sm text-center">
+          <p class="text-gray-400 text-xs uppercase tracking-wide">Trophies</p>
+          <p id="statTrophies" class="text-2xl font-bold text-gray-900 mt-1">—</p>
+        </div>
+        <div class="bg-white rounded-xl p-4 shadow-sm text-center">
+          <p class="text-gray-400 text-xs uppercase tracking-wide">Best</p>
+          <p id="statBest" class="text-2xl font-bold text-gray-900 mt-1">—</p>
+        </div>
+        <div class="bg-white rounded-xl p-4 shadow-sm text-center">
+          <p class="text-gray-400 text-xs uppercase tracking-wide">Win Rate</p>
+          <p id="statWinRate" class="text-2xl font-bold text-gray-900 mt-1">—</p>
+        </div>
+        <div class="bg-white rounded-xl p-4 shadow-sm text-center">
+          <p class="text-gray-400 text-xs uppercase tracking-wide">Battles</p>
+          <p id="statBattles" class="text-2xl font-bold text-gray-900 mt-1">—</p>
+        </div>
+      </div>
+
+      <!-- Dashboard unlock box -->
+      <div id="unlockBox" class="bg-white rounded-xl p-6 shadow-sm space-y-5 border border-gray-100">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">Unlock Your Full Dashboard</h2>
+          <p class="text-gray-500 text-sm mt-1">Win rate by deck, what's beating you, and which cards are underleveled.</p>
+        </div>
+        <input
+          id="emailInput"
+          type="email"
+          placeholder="your@email.com"
+          class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button onclick="unlockDashboard()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors">
+          View My Dashboard
+        </button>
+      </div>
+
+      <!-- Subscribe box (hidden until needed) -->
+      <div id="subscribeBox" class="hidden bg-white rounded-xl p-6 shadow-sm space-y-5 border border-orange-100">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">Unlock Your Full Dashboard</h2>
+          <p class="text-orange-500 text-sm mt-1">No active subscription found for this email.</p>
+        </div>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <button class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors text-sm">
+            Pro — $4.99/month
+          </button>
+          <button class="flex-1 bg-purple-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-purple-700 transition-colors text-sm">
+            Elite — $19.99/month
+          </button>
+        </div>
+        <div class="text-xs text-gray-400 space-y-1">
+          <p><strong>Pro:</strong> Full dashboard — deck win rates, loss patterns, card levels</p>
+          <p><strong>Elite:</strong> Pro + personal gameplay video review by a real player</p>
+        </div>
+      </div>
+
+      <!-- Full dashboard (hidden until subscribed) -->
+      <div id="dashboardFull" class="hidden space-y-4">
+        <p class="text-sm font-semibold text-gray-700">Your Dashboard</p>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+
+          <!-- Deck win rates -->
+          <div class="bg-white rounded-xl p-6 shadow-sm">
+            <h2 class="text-base font-bold text-gray-900 mb-4">Win Rate by Deck</h2>
+            <div class="space-y-3" id="deckList"></div>
+          </div>
+
+          <!-- Loss patterns -->
+          <div class="bg-white rounded-xl p-6 shadow-sm">
+            <h2 class="text-base font-bold text-gray-900 mb-4">Cards Beating You Most</h2>
+            <div class="space-y-3" id="lossList"></div>
+          </div>
+
+          <!-- Card levels -->
+          <div class="bg-white rounded-xl p-6 shadow-sm">
+            <h2 class="text-base font-bold text-gray-900 mb-4">Card Levels</h2>
+            <div class="space-y-2" id="cardList"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const CR_API = 'https://api.clashroyale.com/v1'
+    const CR_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImY3NTVjMGJlLTUwZGItNGI4NS04Y2JjLTZhNDEwY2M0NTVlYiIsImlhdCI6MTc4MTExODk0Mywic3ViIjoiZGV2ZWxvcGVyL2E0Y2M5MTMxLWRjZjQtOTU3OS0xMzdhLTNiMmIxMDYyNjRjMyIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI5OS43Mi4xNTMuMTMyIl0sInR5cGUiOiJjbGllbnQifV19.c5VfSxCFIfJ2l0BQvB3-G9qHl4xWwmw2u-8DuIZM3Jz38j3Wf9FhXkBRNwjZ3JqEk3kuAXhYYi1abGeoQ6fOxw'
+
+    function search(e) {
+      e.preventDefault()
+      const raw = document.getElementById('tagInput').value.trim()
+      if (!raw) return
+      const tag = (raw.startsWith('#') ? raw.slice(1) : raw).toUpperCase()
+      loadPlayer(tag)
+    }
+
+    async function loadPlayer(tag) {
+      if (!CR_KEY) {
+        alert('Add your Clash Royale API key to index.html (the CR_KEY variable at the top of the script) to load real data.')
+        showMockPlayer(tag)
+        return
+      }
+      try {
+        const encoded = encodeURIComponent('#' + tag)
+        const [playerRes, battlesRes] = await Promise.all([
+          fetch(`${CR_API}/players/${encoded}`, { headers: { Authorization: `Bearer ${CR_KEY}` } }),
+          fetch(`${CR_API}/players/${encoded}/battlelog`, { headers: { Authorization: `Bearer ${CR_KEY}` } }),
+        ])
+        if (!playerRes.ok) { alert('Player not found. Check your tag.'); return }
+        const player = await playerRes.json()
+        const battles = await battlesRes.json()
+        showPlayer(player, battles)
+      } catch {
+        alert('Could not reach the CR API. This file must be served from the same IP as your API key.')
+        showMockPlayer(tag)
+      }
+    }
+
+    function showMockPlayer(tag) {
+      const mockPlayer = {
+        name: 'YourName', tag: '#' + tag, trophies: 5420, bestTrophies: 5800,
+        wins: 312, losses: 198, battleCount: 510,
+        arena: { name: 'Master I' },
+        currentDeck: [
+          { name: 'Hog Rider', level: 11, maxLevel: 14 },
+          { name: 'Fireball', level: 12, maxLevel: 14 },
+          { name: 'Musketeer', level: 10, maxLevel: 14 },
+          { name: 'Ice Spirit', level: 14, maxLevel: 14 },
+        ]
+      }
+      const mockBattles = [
+        { team: [{ tag: '#' + tag, crowns: 0, cards: [{ name: 'Hog Rider' }] }], opponent: [{ tag: '#OP1', crowns: 3, cards: [{ name: 'Lava Hound' }, { name: 'Balloon' }] }] },
+        { team: [{ tag: '#' + tag, crowns: 2, cards: [{ name: 'Hog Rider' }] }], opponent: [{ tag: '#OP2', crowns: 1, cards: [{ name: 'Giant' }] }] },
+        { team: [{ tag: '#' + tag, crowns: 0, cards: [{ name: 'Hog Rider' }] }], opponent: [{ tag: '#OP3', crowns: 3, cards: [{ name: 'Lava Hound' }, { name: 'Minions' }] }] },
+        { team: [{ tag: '#' + tag, crowns: 3, cards: [{ name: 'Hog Rider' }] }], opponent: [{ tag: '#OP4', crowns: 0, cards: [{ name: 'Golem' }] }] },
+      ]
+      showPlayer(mockPlayer, mockBattles)
+    }
+
+    function showPlayer(player, battles) {
+      document.getElementById('landing').classList.add('hidden')
+      document.getElementById('playerPage').classList.remove('hidden')
+
+      document.getElementById('playerName').textContent = player.name
+      document.getElementById('playerMeta').textContent = `${player.arena.name} · ${player.tag}`
+
+      const winRate = Math.round((player.wins / Math.max(player.battleCount, 1)) * 100)
+      document.getElementById('statTrophies').textContent = player.trophies.toLocaleString()
+      document.getElementById('statBest').textContent = player.bestTrophies.toLocaleString()
+      document.getElementById('statWinRate').textContent = winRate + '%'
+      document.getElementById('statBattles').textContent = player.battleCount.toLocaleString()
+
+      window._player = player
+      window._battles = battles
+    }
+
+    function unlockDashboard() {
+      const email = document.getElementById('emailInput').value.trim()
+      if (!email) { alert('Please enter your email'); return }
+      // In production this checks Stripe subscription — for now show the subscribe options
+      document.getElementById('unlockBox').classList.add('hidden')
+      document.getElementById('subscribeBox').classList.remove('hidden')
+    }
+
+    function showFullDashboard() {
+      const battles = window._battles || []
+      const player = window._player
+      document.getElementById('unlockBox').classList.add('hidden')
+      document.getElementById('subscribeBox').classList.add('hidden')
+      document.getElementById('dashboardFull').classList.remove('hidden')
+
+      // Deck win rates
+      const deckMap = {}
+      battles.forEach(b => {
+        const team = b.team.find(t => t.tag === player.tag) || b.team[0]
+        const opp = b.opponent[0]
+        if (!team || !opp) return
+        const sig = (team.cards || []).map(c => c.name).sort().join(' + ') || 'Unknown'
+        if (!deckMap[sig]) deckMap[sig] = { wins: 0, total: 0 }
+        deckMap[sig].total++
+        if (team.crowns > opp.crowns) deckMap[sig].wins++
+      })
+      const decks = Object.entries(deckMap).sort((a, b) => b[1].total - a[1].total).slice(0, 5)
+      document.getElementById('deckList').innerHTML = decks.map(([sig, d]) => {
+        const wr = Math.round((d.wins / d.total) * 100)
+        return `<div>
+          <div class="flex justify-between text-sm mb-1"><span class="text-gray-600 truncate pr-2">${sig}</span><span class="font-semibold">${wr}%</span></div>
+          <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full rounded-full ${wr >= 50 ? 'bg-green-400' : 'bg-red-400'}" style="width:${wr}%"></div></div>
+          <p class="text-xs text-gray-400 mt-1">${d.wins}W / ${d.total - d.wins}L</p>
+        </div>`
+      }).join('') || '<p class="text-gray-400 text-sm">Not enough data.</p>'
+
+      // Loss patterns
+      const lossMap = {}
+      battles.forEach(b => {
+        const team = b.team.find(t => t.tag === player.tag) || b.team[0]
+        const opp = b.opponent[0]
+        if (!team || !opp) return
+        if (team.crowns < opp.crowns) {
+          ;(opp.cards || []).forEach(c => { lossMap[c.name] = (lossMap[c.name] || 0) + 1 })
+        }
+      })
+      const losses = Object.entries(lossMap).sort((a, b) => b[1] - a[1]).slice(0, 5)
+      const maxLoss = losses[0]?.[1] || 1
+      document.getElementById('lossList').innerHTML = losses.map(([card, count]) =>
+        `<div>
+          <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">${card}</span><span class="font-semibold text-red-500">${count}x</span></div>
+          <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-red-400 rounded-full" style="width:${(count / maxLoss) * 100}%"></div></div>
+        </div>`
+      ).join('') || '<p class="text-gray-400 text-sm">No losses — nice!</p>'
+
+      // Card levels
+      document.getElementById('cardList').innerHTML = (player.currentDeck || []).map(c => {
+        const gap = c.maxLevel - c.level
+        const badge = gap > 0
+          ? `<span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">-${gap}</span>`
+          : `<span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">MAX</span>`
+        return `<div class="flex items-center gap-3">
+          <span class="flex-1 text-sm text-gray-700">${c.name}</span>
+          <span class="text-sm font-semibold">${c.level}/${c.maxLevel}</span>
+          ${badge}
+        </div>`
+      }).join('')
+    }
+
+    function goBack() {
+      document.getElementById('playerPage').classList.add('hidden')
+      document.getElementById('landing').classList.remove('hidden')
+      document.getElementById('unlockBox').classList.remove('hidden')
+      document.getElementById('subscribeBox').classList.add('hidden')
+      document.getElementById('dashboardFull').classList.add('hidden')
+    }
+  </script>
+
+</body>
+</html>
