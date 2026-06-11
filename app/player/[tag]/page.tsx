@@ -29,6 +29,7 @@ export default async function PlayerPage({
         <p className="text-red-600 text-xl font-semibold">Player not found.</p>
         <p className="text-gray-500">Check your tag and try again.</p>
         <p className="text-xs text-gray-400 font-mono">{msg} · IP: {serverIp}</p>
+        <p className="text-xs text-gray-400 font-mono">Key ends: ...{(process.env.CLASH_ROYALE_API_KEY ?? '').slice(-10)}</p>
         <Link href="/" className="text-blue-600 underline">← Go back</Link>
       </main>
     )
