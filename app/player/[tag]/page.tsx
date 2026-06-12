@@ -1,5 +1,6 @@
 import { fetchPlayer, fetchBattleLog } from '@/lib/clash-royale'
 import PlayerStats from '@/components/PlayerStats'
+import CurrentDeck from '@/components/CurrentDeck'
 import DashboardSection from './DashboardSection'
 import Link from 'next/link'
 
@@ -38,6 +39,8 @@ export default async function PlayerPage({
         </div>
 
         <PlayerStats player={player} />
+
+        <CurrentDeck player={player} />
 
         <DashboardSection player={player} battles={battles} tag={tag} />
       </div>
