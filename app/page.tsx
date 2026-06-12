@@ -31,6 +31,26 @@ export default function Home() {
         </a>
       </section>
 
+      {/* Testimonials */}
+      <section className="max-w-4xl mx-auto px-6 pb-16 space-y-8">
+        <h2 className="text-2xl font-black text-white text-center">What Players Are Saying</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { quote: "I went from 5,200 to 6,100 trophies in 2 weeks after finding out Mega Knight was destroying me in 40% of my games.", name: "Tyler K.", trophy: "6,100 🏆" },
+            { quote: "Didn't realize my Arrows were 6 levels below max until CR Coach showed me. Upgraded it and my win rate jumped immediately.", name: "Jordan M.", trophy: "5,800 🏆" },
+            { quote: "The deck win rate chart is exactly what I needed. Switched decks based on it and went 8-2 in my next 10 games.", name: "Alex R.", trophy: "7,200 🏆" },
+          ].map(t => (
+            <div key={t.name} className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
+              <p className="text-gray-300 text-sm leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+              <div>
+                <p className="text-white text-sm font-semibold">{t.name}</p>
+                <p className="text-gray-500 text-xs">{t.trophy}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" className="max-w-5xl mx-auto px-6 pb-24 space-y-10">
         <div className="text-center space-y-2">
