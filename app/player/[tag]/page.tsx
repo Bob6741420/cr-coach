@@ -16,20 +16,11 @@ export default async function PlayerPage({
       fetchPlayer(tag),
       fetchBattleLog(tag),
     ])
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    let serverIp = 'unknown'
-    try {
-      const ipRes = await fetch('https://api.ipify.org?format=json')
-      const ipData = await ipRes.json()
-      serverIp = ipData.ip
-    } catch {}
+  } catch {
     return (
       <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
         <p className="text-red-600 text-xl font-semibold">Player not found.</p>
         <p className="text-gray-500">Check your tag and try again.</p>
-        <p className="text-xs text-gray-400 font-mono">{msg} · IP: {serverIp}</p>
-        <p className="text-xs text-gray-400 font-mono">Key ends: ...{(process.env.CLASH_ROYALE_API_KEY ?? '').slice(-10)}</p>
         <Link href="/" className="text-blue-600 underline">← Go back</Link>
       </main>
     )
