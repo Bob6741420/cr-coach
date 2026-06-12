@@ -71,7 +71,7 @@ export default function DashboardSection({
 
   return (
     <div className="space-y-4">
-      <DashboardPreview />
+      <DashboardPreview player={player} battles={battles} />
     <div className="bg-white rounded-xl p-6 shadow-sm space-y-5 border border-gray-100">
       <div>
         <h2 className="text-lg font-bold text-gray-900">Unlock Your Full Dashboard</h2>
