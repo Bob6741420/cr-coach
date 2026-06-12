@@ -1,8 +1,33 @@
+import type { Metadata } from 'next'
 import { fetchPlayer, fetchBattleLog } from '@/lib/clash-royale'
+import { computeStreak } from '@/lib/stats'
 import PlayerStats from '@/components/PlayerStats'
 import CurrentDeck from '@/components/CurrentDeck'
+import RecentBattles from '@/components/RecentBattles'
 import DashboardSection from './DashboardSection'
 import Link from 'next/link'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ tag: string }>
+}): Promise<Metadata> {
+  const { tag } = await params
+  try {
+    const player = await fetchPlayer(tag)
+    const winRate = Math.round((player.wins / Math.max(player.battleCount, 1)) * 100)
+    const title = `${player.name} — CR Coach`
+    const description = `${player.trophies.toLocaleString()} trophies · ${winRate}% win rate · See what's beating ${player.name} and how to improve.`
+    return {
+      title,
+      description,
+      openGraph: { title, description },
+      twitter: { card: 'summary', title, description },
+    }
+  } catch {
+    return { title: 'Player — CR Coach' }
+  }
+}
 
 export default async function PlayerPage({
   params,
@@ -27,6 +52,8 @@ export default async function PlayerPage({
     )
   }
 
+  const streak = computeStreak(battles, player.tag)
+
   return (
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-3xl mx-auto space-y-6">
@@ -40,7 +67,20 @@ export default async function PlayerPage({
 
         <PlayerStats player={player} />
 
+        {streak && streak.count >= 3 && (
+          <div className={`rounded-xl px-5 py-3 text-sm font-semibold flex items-center gap-2 ${
+            streak.type === 'win'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-red-100 text-red-800'
+          }`}>
+            {streak.type === 'win' ? '🔥' : '💀'}
+            {streak.count}-game {streak.type === 'win' ? 'win' : 'losing'} streak
+          </div>
+        )}
+
         <CurrentDeck player={player} />
+
+        <RecentBattles battles={battles} tag={player.tag} />
 
         <DashboardSection player={player} battles={battles} tag={tag} />
       </div>

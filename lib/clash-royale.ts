@@ -27,9 +27,10 @@ export interface CRPlayer {
 
 export interface BattleLogEntry {
   type: string
+  battleTime: string
   gameMode: { name: string }
-  team: Array<{ tag: string; crowns: number; cards: Array<{ name: string; iconUrls?: { medium: string } }> }>
-  opponent: Array<{ tag: string; crowns: number; cards: Array<{ name: string; iconUrls?: { medium: string } }> }>
+  team: Array<{ tag: string; name: string; crowns: number; cards: Array<{ name: string; iconUrls?: { medium: string } }> }>
+  opponent: Array<{ tag: string; name: string; crowns: number; cards: Array<{ name: string; iconUrls?: { medium: string } }> }>
 }
 
 export async function fetchPlayer(tag: string): Promise<CRPlayer> {

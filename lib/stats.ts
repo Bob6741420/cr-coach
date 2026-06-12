@@ -31,6 +31,29 @@ function opponentTeam(battle: BattleLogEntry, tag: string) {
   return battle.opponent.find(t => t.tag !== normalTag) ?? battle.opponent[0]
 }
 
+export interface Streak {
+  type: 'win' | 'loss'
+  count: number
+}
+
+export function computeStreak(battles: BattleLogEntry[], tag: string): Streak | null {
+  const results: ('win' | 'loss')[] = []
+  for (const b of battles) {
+    const team = playerTeam(b, tag)
+    const opp = opponentTeam(b, tag)
+    if (!team || !opp || team.crowns === opp.crowns) continue
+    results.push(team.crowns > opp.crowns ? 'win' : 'loss')
+  }
+  if (results.length === 0) return null
+  const first = results[0]
+  let count = 0
+  for (const r of results) {
+    if (r === first) count++
+    else break
+  }
+  return { type: first, count }
+}
+
 export function computeDeckWinRates(battles: BattleLogEntry[], tag: string): DeckWinRate[] {
   const map = new Map<string, { wins: number; battles: number }>()
   for (const b of battles) {

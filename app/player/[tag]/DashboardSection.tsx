@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import SubscribeButton from '@/components/SubscribeButton'
+import DashboardPreview from '@/components/DashboardPreview'
 import DeckBreakdown from '@/components/DeckBreakdown'
 import LossPatterns from '@/components/LossPatterns'
 import CardLevels from '@/components/CardLevels'
@@ -69,6 +70,8 @@ export default function DashboardSection({
   }
 
   return (
+    <div className="space-y-4">
+      <DashboardPreview />
     <div className="bg-white rounded-xl p-6 shadow-sm space-y-5 border border-gray-100">
       <div>
         <h2 className="text-lg font-bold text-gray-900">Unlock Your Full Dashboard</h2>
@@ -120,6 +123,7 @@ export default function DashboardSection({
       {error && error !== 'subscription_required' && (
         <p className="text-red-500 text-sm">{error}</p>
       )}
+    </div>
     </div>
   )
 }

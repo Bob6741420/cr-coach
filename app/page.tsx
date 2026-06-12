@@ -20,6 +20,12 @@ export default function Home() {
         </div>
         <TagInput />
         <p className="text-blue-400 text-sm">Free to try · No account needed</p>
+        <details className="text-sm text-blue-400 cursor-pointer">
+          <summary className="hover:text-blue-200 transition-colors">How do I find my tag?</summary>
+          <p className="mt-2 text-blue-300 text-xs max-w-xs mx-auto leading-relaxed">
+            Open Clash Royale → tap your profile picture (top left) → your tag is shown below your name starting with #. Type it in above.
+          </p>
+        </details>
         <a href="#pricing" className="text-blue-500 text-xs hover:text-blue-300 transition-colors">
           See pricing ↓
         </a>
