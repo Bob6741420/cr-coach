@@ -70,6 +70,6 @@ export function computeLossPatterns(battles: BattleLogEntry[], tag: string): Los
 
 export function computeCardLevels(player: CRPlayer): CardLevel[] {
   return player.currentDeck
-    .map(c => ({ name: c.name, level: c.level, maxLevel: c.maxLevel, gap: c.maxLevel - c.level, iconUrl: c.iconUrls?.medium }))
+    .map(c => ({ name: c.name, level: c.level, maxLevel: 16, gap: 16 - c.level, iconUrl: c.iconUrls?.medium }))
     .sort((a, b) => b.gap - a.gap)
 }
