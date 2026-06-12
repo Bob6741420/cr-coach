@@ -4,7 +4,7 @@ export default function CurrentDeck({ player }: { player: CRPlayer }) {
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm">
       <h2 className="text-base font-bold text-gray-900 mb-4">Current Deck</h2>
-      <div className="grid grid-cols-8 gap-2">
+      <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
         {player.currentDeck.map(card => (
           <div key={card.name} className="flex flex-col items-center gap-1">
             {card.iconUrls?.medium ? (

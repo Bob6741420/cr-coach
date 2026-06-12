@@ -13,8 +13,8 @@ export default function Home() {
           <span className="inline-block bg-blue-800/60 border border-blue-700 text-blue-300 text-xs font-semibold px-4 py-1.5 rounded-full tracking-wide uppercase">
             Real battle data · No AI · No fluff
           </span>
-          <h1 className="text-6xl font-black text-white tracking-tight">CR Coach</h1>
-          <p className="text-blue-200 text-xl max-w-md mx-auto leading-relaxed">
+          <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">CR Coach</h1>
+          <p className="text-blue-200 text-lg sm:text-xl max-w-md mx-auto leading-relaxed">
             See exactly what&apos;s beating you, which cards need leveling, and what to do about it — in plain English.
           </p>
         </div>

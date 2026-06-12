@@ -4,6 +4,8 @@ import { computeStreak } from '@/lib/stats'
 import PlayerStats from '@/components/PlayerStats'
 import CurrentDeck from '@/components/CurrentDeck'
 import RecentBattles from '@/components/RecentBattles'
+import TrophyChart from '@/components/TrophyChart'
+import ShareButton from '@/components/ShareButton'
 import DashboardSection from './DashboardSection'
 import Link from 'next/link'
 
@@ -57,12 +59,15 @@ export default async function PlayerPage({
   return (
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-3xl mx-auto space-y-6">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-gray-900">{player.name}</h1>
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 break-words">{player.name}</h1>
             <p className="text-gray-400 text-sm mt-1">{player.arena.name} · {player.tag}</p>
           </div>
-          <Link href="/" className="text-sm text-gray-400 hover:text-gray-600">← Search again</Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <ShareButton tag={player.tag} />
+            <Link href="/" className="text-sm text-gray-400 hover:text-gray-600 hidden sm:block">← Search again</Link>
+          </div>
         </div>
 
         <PlayerStats player={player} />
@@ -79,6 +84,8 @@ export default async function PlayerPage({
         )}
 
         <CurrentDeck player={player} />
+
+        <TrophyChart battles={battles} tag={player.tag} currentTrophies={player.trophies} />
 
         <RecentBattles battles={battles} tag={player.tag} />
 
