@@ -20,8 +20,8 @@ const COUNTER_TIPS: Record<string, string> = {
   'Electro Giant': 'Keep your troops spread out so it can\'t chain the zap — use buildings to bait it.',
   'Ram Rider': 'Swarm it from behind with cheap troops — the snare makes it hard to use with pushes.',
   'Witch': 'A Log or Arrows kills the skeletons and can damage the Witch. Outrun her skeleton spawn.',
-  'Sparky': 'Zap or Log resets her charge. Keep your troops spread so she can\'t chain.',
-  'Inferno Dragon': 'Zap or any spell resets its charge. Distract it with a cheap card.',
+  'Sparky': 'Zap or Electro Wizard resets her charge (stuns only — Log doesn\'t work). Keep your troops spread so she can\'t chain.',
+  'Inferno Dragon': 'Zap, Freeze, or Electro Wizard resets its charge — stuns and freezes are the only things that work. Distract it with a cheap card first.',
   'Electro Wizard': 'Pair him with a tank — he resets, but can\'t stop a full push alone.',
 }
 
