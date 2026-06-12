@@ -44,7 +44,7 @@ export default function TrophyChart({
           <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#9ca3af' }} interval="preserveStartEnd" axisLine={false} tickLine={false} />
           <YAxis domain={[min - pad, max + pad]} tick={{ fontSize: 10, fill: '#9ca3af' }} width={48} axisLine={false} tickLine={false} />
           <Tooltip
-            formatter={(v: number) => [v.toLocaleString(), 'Trophies']}
+            formatter={(v: unknown) => [Number(v).toLocaleString(), 'Trophies']}
             contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
           />
           <Line type="monotone" dataKey="trophies" stroke={trending ? '#22c55e' : '#ef4444'} strokeWidth={2} dot={false} />
