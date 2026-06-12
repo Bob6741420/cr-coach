@@ -3,7 +3,7 @@ import type { BattleLogEntry } from '@/lib/clash-royale'
 export default function RecentBattles({ battles, tag }: { battles: BattleLogEntry[]; tag: string }) {
   const normalTag = tag.startsWith('#') ? tag : '#' + tag
 
-  const recent = battles.slice(0, 5).map(b => {
+  const recent = battles.map(b => {
     const team = b.team.find(t => t.tag === normalTag) ?? b.team[0]
     const opp = b.opponent[0]
     const won = team.crowns > opp.crowns
