@@ -21,15 +21,15 @@ export interface CRPlayer {
   wins: number
   losses: number
   battleCount: number
-  currentDeck: Array<{ name: string; level: number; maxLevel: number }>
+  currentDeck: Array<{ name: string; level: number; maxLevel: number; iconUrls?: { medium: string } }>
   arena: { name: string }
 }
 
 export interface BattleLogEntry {
   type: string
   gameMode: { name: string }
-  team: Array<{ tag: string; crowns: number; cards: Array<{ name: string }> }>
-  opponent: Array<{ tag: string; crowns: number; cards: Array<{ name: string }> }>
+  team: Array<{ tag: string; crowns: number; cards: Array<{ name: string; iconUrls?: { medium: string } }> }>
+  opponent: Array<{ tag: string; crowns: number; cards: Array<{ name: string; iconUrls?: { medium: string } }> }>
 }
 
 export async function fetchPlayer(tag: string): Promise<CRPlayer> {

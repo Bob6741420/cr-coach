@@ -4,14 +4,17 @@ import SubscribeButton from '@/components/SubscribeButton'
 import DeckBreakdown from '@/components/DeckBreakdown'
 import LossPatterns from '@/components/LossPatterns'
 import CardLevels from '@/components/CardLevels'
+import Insights from '@/components/Insights'
 import type { CRPlayer, BattleLogEntry } from '@/lib/clash-royale'
 import type { DeckWinRate, LossPattern, CardLevel } from '@/lib/stats'
+import type { Insight } from '@/lib/insights'
 
 interface DashboardData {
   tier: 'pro' | 'elite'
   deckWinRates: DeckWinRate[]
   lossPatterns: LossPattern[]
   cardLevels: CardLevel[]
+  insights: Insight[]
 }
 
 export default function DashboardSection({
@@ -55,6 +58,7 @@ export default function DashboardSection({
             <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-semibold">Elite</span>
           )}
         </div>
+        <Insights insights={data.insights} />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <DeckBreakdown decks={data.deckWinRates} />
           <LossPatterns patterns={data.lossPatterns} />

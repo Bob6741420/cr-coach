@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSubscription } from '@/lib/supabase'
 import { computeDeckWinRates, computeLossPatterns, computeCardLevels } from '@/lib/stats'
+import { generateInsights } from '@/lib/insights'
 import type { CRPlayer, BattleLogEntry } from '@/lib/clash-royale'
 
 export async function POST(req: NextRequest) {
@@ -20,10 +21,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Subscription required' }, { status: 403 })
   }
 
-  return NextResponse.json({
-    tier,
-    deckWinRates: computeDeckWinRates(battles, player.tag),
-    lossPatterns: computeLossPatterns(battles, player.tag),
-    cardLevels: computeCardLevels(player),
-  })
+  const deckWinRates = computeDeckWinRates(battles, player.tag)
+  const lossPatterns = computeLossPatterns(battles, player.tag)
+  const cardLevels = computeCardLevels(player)
+  const insights = generateInsights(player, deckWinRates, lossPatterns, cardLevels)
+
+  return NextResponse.json({ tier, deckWinRates, lossPatterns, cardLevels, insights })
 }

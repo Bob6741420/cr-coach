@@ -10,6 +10,7 @@ export interface DeckWinRate {
 export interface LossPattern {
   card: string
   count: number
+  iconUrl?: string
 }
 
 export interface CardLevel {
@@ -17,6 +18,7 @@ export interface CardLevel {
   level: number
   maxLevel: number
   gap: number
+  iconUrl?: string
 }
 
 function playerTeam(battle: BattleLogEntry, tag: string) {
@@ -48,25 +50,26 @@ export function computeDeckWinRates(battles: BattleLogEntry[], tag: string): Dec
 }
 
 export function computeLossPatterns(battles: BattleLogEntry[], tag: string): LossPattern[] {
-  const counts = new Map<string, number>()
+  const counts = new Map<string, { count: number; iconUrl?: string }>()
   for (const b of battles) {
     const team = playerTeam(b, tag)
     const opp = opponentTeam(b, tag)
     if (!team || !opp) continue
     if (team.crowns < opp.crowns) {
       for (const card of opp.cards) {
-        counts.set(card.name, (counts.get(card.name) ?? 0) + 1)
+        const existing = counts.get(card.name) ?? { count: 0 }
+        counts.set(card.name, { count: existing.count + 1, iconUrl: existing.iconUrl ?? card.iconUrls?.medium })
       }
     }
   }
   return Array.from(counts.entries())
-    .map(([card, count]) => ({ card, count }))
+    .map(([card, { count, iconUrl }]) => ({ card, count, iconUrl }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 10)
 }
 
 export function computeCardLevels(player: CRPlayer): CardLevel[] {
   return player.currentDeck
-    .map(c => ({ name: c.name, level: c.level, maxLevel: c.maxLevel, gap: c.maxLevel - c.level }))
+    .map(c => ({ name: c.name, level: c.level, maxLevel: c.maxLevel, gap: c.maxLevel - c.level, iconUrl: c.iconUrls?.medium }))
     .sort((a, b) => b.gap - a.gap)
 }
