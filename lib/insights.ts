@@ -1,4 +1,4 @@
-import type { CRPlayer } from './clash-royale'
+import type { CRPlayer, BattleLogEntry } from './clash-royale'
 import type { DeckWinRate, LossPattern, CardLevel } from './stats'
 
 export interface Insight {
@@ -30,26 +30,42 @@ export function generateInsights(
   deckWinRates: DeckWinRate[],
   lossPatterns: LossPattern[],
   cardLevels: CardLevel[],
+  battles: BattleLogEntry[],
 ): Insight[] {
   const insights: Insight[] = []
+
+  const totalBattles = battles.length
+  const recentLosses = battles.filter(b => {
+    const team = b.team[0]
+    const opp = b.opponent[0]
+    return team && opp && team.crowns < opp.crowns
+  }).length
+  const recentWins = totalBattles - recentLosses
+  const recentWinRate = totalBattles > 0 ? Math.round((recentWins / totalBattles) * 100) : 0
+  const lossPercent = 100 - recentWinRate
 
   // Trophy drop
   const trophyGap = player.bestTrophies - player.trophies
   if (trophyGap >= 300) {
     insights.push({
       type: 'warning',
-      title: `You're ${trophyGap} trophies below your best`,
-      body: 'A big drop usually means your deck or card levels aren\'t keeping up with opponents at your peak. Check what\'s beating you most below.',
+      title: `You're ${trophyGap} trophies below your best (${player.trophies.toLocaleString()} vs ${player.bestTrophies.toLocaleString()})`,
+      body: 'A drop this big usually means your deck or card levels aren\'t keeping up at your peak trophy range. The cards beating you below are likely the reason.',
     })
   }
 
-  // Overall win rate
-  const overallWinRate = Math.round((player.wins / Math.max(player.battleCount, 1)) * 100)
-  if (overallWinRate >= 58) {
+  // Loss rate at current trophy range
+  if (totalBattles >= 10 && lossPercent >= 40) {
+    insights.push({
+      type: 'warning',
+      title: `${lossPercent}% of players at ${player.arena.name} are beating you`,
+      body: `In your last ${totalBattles} battles you won ${recentWins} and lost ${recentLosses}. At ${player.trophies.toLocaleString()} trophies, closing that gap starts with the fixes below.`,
+    })
+  } else if (totalBattles >= 10 && recentWinRate >= 60) {
     insights.push({
       type: 'good',
-      title: `${overallWinRate}% career win rate — solid`,
-      body: 'You win more than you lose overall. The improvements below can push you even higher.',
+      title: `You're beating ${recentWinRate}% of players at ${player.arena.name}`,
+      body: `${recentWins}W / ${recentLosses}L in your last ${totalBattles} battles. You're performing well — small improvements below can push you even higher.`,
     })
   }
 
@@ -59,14 +75,14 @@ export function generateInsights(
     if (mainDeck.winRate < 45) {
       insights.push({
         type: 'warning',
-        title: `Your deck is losing more than winning (${mainDeck.winRate}% over ${mainDeck.battles} games)`,
-        body: 'This deck isn\'t working well for you right now. Try swapping out your weakest card or look for a different deck that counters what\'s beating you.',
+        title: `Your deck is losing more than winning — ${mainDeck.winRate}% over ${mainDeck.battles} games`,
+        body: `${mainDeck.wins}W / ${mainDeck.battles - mainDeck.wins}L with this deck. That's a losing record. Try swapping your weakest card or pick a deck that counters what's beating you.`,
       })
     } else if (mainDeck.winRate >= 60) {
       insights.push({
         type: 'good',
-        title: `Your deck is hot right now (${mainDeck.winRate}% over ${mainDeck.battles} games)`,
-        body: 'Keep playing this deck. Focus your upgrade resources on the most underleveled card.',
+        title: `Your deck is working — ${mainDeck.winRate}% over ${mainDeck.battles} games`,
+        body: `${mainDeck.wins}W / ${mainDeck.battles - mainDeck.wins}L. Keep playing this deck and focus resources on leveling your weakest card.`,
       })
     }
   }
@@ -74,21 +90,23 @@ export function generateInsights(
   // Top loss threat
   const topThreat = lossPatterns[0]
   if (topThreat && topThreat.count >= 3) {
+    const pct = Math.round((topThreat.count / Math.max(totalBattles, 1)) * 100)
     const tip = COUNTER_TIPS[topThreat.card]
     insights.push({
       type: 'tip',
-      title: `${topThreat.card} shows up in ${topThreat.count} of your losses`,
-      body: tip ?? `Your deck might not have a great answer to ${topThreat.card}. Consider adding a card that directly counters it.`,
+      title: `${topThreat.card} appears in ${topThreat.count} of your losses — that's ${pct}% of all your recent games`,
+      body: tip ?? `Your deck doesn't have a reliable answer to ${topThreat.card}. Consider adding a card that directly counters it.`,
     })
   }
 
-  // Second loss threat if significantly different card
-  if (lossPatterns.length >= 2 && lossPatterns[1].count >= 3 && lossPatterns[1].card !== lossPatterns[0]?.card) {
+  // Second loss threat
+  if (lossPatterns.length >= 2 && lossPatterns[1].count >= 3) {
     const tip = COUNTER_TIPS[lossPatterns[1].card]
     if (tip) {
+      const pct = Math.round((lossPatterns[1].count / Math.max(totalBattles, 1)) * 100)
       insights.push({
         type: 'tip',
-        title: `${lossPatterns[1].card} also appears in ${lossPatterns[1].count} losses`,
+        title: `${lossPatterns[1].card} also shows up in ${lossPatterns[1].count} losses (${pct}% of games)`,
         body: tip,
       })
     }
@@ -99,20 +117,20 @@ export function generateInsights(
   if (worstCard && worstCard.gap >= 4) {
     insights.push({
       type: 'warning',
-      title: `${worstCard.name} is ${worstCard.gap} levels below max (${worstCard.level}/${worstCard.maxLevel})`,
-      body: 'Underleveled cards lose one-on-one to max-level versions. Upgrading this should be your top priority in the Shop.',
+      title: `${worstCard.name} is ${worstCard.gap} levels below max — it loses every direct fight`,
+      body: `At ${worstCard.level}/16, your ${worstCard.name} gets out-damaged by fully leveled versions. This costs you games even when you play correctly. Upgrade it first.`,
     })
   } else if (worstCard && worstCard.gap >= 2) {
     insights.push({
       type: 'tip',
-      title: `${worstCard.name} could use upgrading (${worstCard.level}/${worstCard.maxLevel})`,
-      body: 'A couple level gaps won\'t break you, but closing them gives you an edge in close matchups.',
+      title: `${worstCard.name} is ${worstCard.gap} levels below max (${worstCard.level}/16)`,
+      body: 'A 2-level gap won\'t always decide fights, but closing it gives you an edge in the close matchups that matter most.',
     })
   } else if (cardLevels.length > 0 && cardLevels.every(c => c.gap === 0)) {
     insights.push({
       type: 'good',
       title: 'All your cards are max level',
-      body: 'No level disadvantages — your losses are pure strategy. Focus on learning the counters above.',
+      body: 'No level disadvantages at all — your losses are purely about strategy and matchups, not card levels.',
     })
   }
 
