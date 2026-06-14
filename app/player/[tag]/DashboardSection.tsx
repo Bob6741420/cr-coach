@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getBrowserSupabase } from '@/lib/supabase-browser'
 import SubscribeButton from '@/components/SubscribeButton'
 import DashboardPreview from '@/components/DashboardPreview'
@@ -19,7 +19,7 @@ interface DashboardData {
   insights: Insight[]
 }
 
-type Step = 'email' | 'otp' | 'subscribe' | 'done'
+type Step = 'email' | 'sent' | 'subscribe' | 'done'
 
 export default function DashboardSection({
   player,
@@ -32,49 +32,55 @@ export default function DashboardSection({
 }) {
   const [step, setStep] = useState<Step>('email')
   const [email, setEmail] = useState('')
-  const [code, setCode] = useState('')
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function sendCode() {
-    if (!email) return setError('Please enter your email')
+  async function fetchDashboard(accessToken: string) {
     setLoading(true)
     setError(null)
-    const supabase = getBrowserSupabase()
-    const { error: err } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: true },
-    })
-    setLoading(false)
-    if (err) return setError(err.message)
-    setStep('otp')
-  }
-
-  async function verifyCode() {
-    if (!code) return setError('Please enter the code')
-    setLoading(true)
-    setError(null)
-    const supabase = getBrowserSupabase()
-    const { data: authData, error: err } = await supabase.auth.verifyOtp({
-      email,
-      token: code,
-      type: 'email',
-    })
-    if (err || !authData.session) {
-      setLoading(false)
-      return setError('Wrong code — check your email and try again')
-    }
     const res = await fetch('/api/dashboard', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ player, battles, accessToken: authData.session.access_token }),
+      body: JSON.stringify({ player, battles, accessToken }),
     })
     setLoading(false)
     if (res.status === 403) return setStep('subscribe')
     if (!res.ok) return setError('Something went wrong')
     setData(await res.json())
     setStep('done')
+  }
+
+  useEffect(() => {
+    const supabase = getBrowserSupabase()
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) fetchDashboard(session.access_token)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) fetchDashboard(session.access_token)
+    })
+
+    return () => subscription.unsubscribe()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function sendLink() {
+    if (!email) return setError('Please enter your email')
+    setLoading(true)
+    setError(null)
+    const supabase = getBrowserSupabase()
+    const { error: err } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: window.location.href,
+      },
+    })
+    setLoading(false)
+    if (err) return setError(err.message)
+    setStep('sent')
   }
 
   if (step === 'done' && data) {
@@ -92,6 +98,14 @@ export default function DashboardSection({
           <LossPatterns patterns={data.lossPatterns} />
           <CardLevels cards={data.cardLevels} />
         </div>
+      </div>
+    )
+  }
+
+  if (loading && step !== 'email') {
+    return (
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center justify-center h-32">
+        <p className="text-gray-400 text-sm">Loading your dashboard...</p>
       </div>
     )
   }
@@ -114,48 +128,33 @@ export default function DashboardSection({
               placeholder="your@email.com"
               value={email}
               onChange={e => { setEmail(e.target.value); setError(null) }}
-              onKeyDown={e => e.key === 'Enter' && sendCode()}
+              onKeyDown={e => e.key === 'Enter' && sendLink()}
               className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
-              onClick={sendCode}
+              onClick={sendLink}
               disabled={loading}
               className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-              {loading ? 'Sending...' : 'Send Code'}
+              {loading ? 'Sending...' : 'Send Sign-In Link'}
             </button>
           </>
         )}
 
-        {step === 'otp' && (
-          <>
-            <p className="text-sm text-gray-600">
-              We sent a 6-digit code to <strong>{email}</strong>. Check your inbox.
+        {step === 'sent' && (
+          <div className="text-center space-y-3 py-4">
+            <p className="text-2xl">📬</p>
+            <p className="text-sm font-semibold text-gray-900">Check your email</p>
+            <p className="text-sm text-gray-500">
+              We sent a sign-in link to <strong>{email}</strong>. Click it and you&apos;ll be brought right back here.
             </p>
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="123456"
-              maxLength={6}
-              value={code}
-              onChange={e => { setCode(e.target.value.replace(/\D/g, '')); setError(null) }}
-              onKeyDown={e => e.key === 'Enter' && verifyCode()}
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 tracking-widest text-center text-lg font-mono"
-            />
             <button
-              onClick={verifyCode}
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors"
-            >
-              {loading ? 'Verifying...' : 'Verify Code'}
-            </button>
-            <button
-              onClick={() => { setStep('email'); setCode(''); setError(null) }}
-              className="w-full text-gray-400 text-sm hover:text-gray-600 transition-colors"
+              onClick={() => { setStep('email'); setError(null) }}
+              className="text-blue-500 text-xs hover:text-blue-700 transition-colors"
             >
               Use a different email
             </button>
-          </>
+          </div>
         )}
 
         {step === 'subscribe' && (
