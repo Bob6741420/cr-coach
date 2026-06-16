@@ -13,6 +13,14 @@ async function crFetch(path: string) {
   return res.json()
 }
 
+export interface DeckCard {
+  name: string
+  level: number
+  maxLevel: number
+  evolutionLevel?: number
+  iconUrls?: { medium: string }
+}
+
 export interface CRPlayer {
   tag: string
   name: string
@@ -21,7 +29,8 @@ export interface CRPlayer {
   wins: number
   losses: number
   battleCount: number
-  currentDeck: Array<{ name: string; level: number; maxLevel: number; iconUrls?: { medium: string } }>
+  currentDeck: DeckCard[]
+  currentDeckSupportCards?: DeckCard[]
   arena: { name: string }
 }
 
