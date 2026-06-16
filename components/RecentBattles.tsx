@@ -11,16 +11,22 @@ export default function RecentBattles({ battles, tag }: { battles: BattleLogEntr
   })
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
-      <h2 className="text-base font-bold text-gray-900 mb-4">Recent Battles</h2>
-      <div className="space-y-2">
+    <div className="card p-6">
+      <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-4">Recent Battles</h2>
+      <div className="space-y-1">
         {recent.map((b, i) => (
-          <div key={i} className="flex items-center gap-3 py-1">
-            <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${b.won ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          <div key={i} className="flex items-center gap-3 py-1.5 rounded-lg px-2 transition-colors" style={{ borderRadius: 8 }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          >
+            <span className="text-xs font-bold px-2 py-0.5 rounded-md shrink-0 w-12 text-center" style={{
+              background: b.won ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
+              color: b.won ? '#4ade80' : '#f87171',
+            }}>
               {b.won ? 'WIN' : 'LOSS'}
             </span>
-            <span className="flex-1 text-sm text-gray-700 truncate">{b.opponentName}</span>
-            <span className="text-sm font-mono text-gray-500 shrink-0">{b.myCrowns}–{b.theirCrowns}</span>
+            <span className="flex-1 text-sm text-slate-300 truncate">{b.opponentName}</span>
+            <span className="text-sm font-mono text-slate-500 shrink-0">{b.myCrowns}–{b.theirCrowns}</span>
           </div>
         ))}
       </div>

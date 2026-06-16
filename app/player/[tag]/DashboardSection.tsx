@@ -113,10 +113,10 @@ export default function DashboardSection({
   return (
     <div className="space-y-4">
       <DashboardPreview player={player} battles={battles} />
-      <div className="bg-white rounded-xl p-6 shadow-sm space-y-5 border border-gray-100">
+      <div className="card p-6 space-y-5">
         <div>
-          <h2 className="text-lg font-bold text-gray-900">Unlock Your Full Dashboard</h2>
-          <p className="text-gray-500 text-sm mt-1">
+          <h2 className="text-base font-bold text-white">Unlock Your Full Dashboard</h2>
+          <p className="text-slate-500 text-sm mt-1">
             Based on your last {battles.length} battles — win rate by deck, what&apos;s beating you, and which cards are underleveled.
           </p>
         </div>
@@ -129,12 +129,14 @@ export default function DashboardSection({
               value={email}
               onChange={e => { setEmail(e.target.value); setError(null) }}
               onKeyDown={e => e.key === 'Enter' && sendLink()}
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 text-sm text-white placeholder-slate-500 rounded-lg focus:outline-none transition-all"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}
             />
             <button
               onClick={sendLink}
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="w-full py-3 rounded-xl font-bold text-white disabled:opacity-50 transition-all"
+              style={{ background: 'var(--blue)' }}
             >
               {loading ? 'Sending...' : 'Send Sign-In Link'}
             </button>
@@ -144,13 +146,13 @@ export default function DashboardSection({
         {step === 'sent' && (
           <div className="text-center space-y-3 py-4">
             <p className="text-2xl">📬</p>
-            <p className="text-sm font-semibold text-gray-900">Check your email</p>
-            <p className="text-sm text-gray-500">
-              We sent a sign-in link to <strong>{email}</strong>. Click it and you&apos;ll be brought right back here.
+            <p className="text-sm font-semibold text-white">Check your email</p>
+            <p className="text-sm text-slate-400">
+              We sent a sign-in link to <strong className="text-slate-300">{email}</strong>. Click it and you&apos;ll be brought right back here.
             </p>
             <button
               onClick={() => { setStep('email'); setError(null) }}
-              className="text-blue-500 text-xs hover:text-blue-700 transition-colors"
+              className="text-slate-500 text-xs hover:text-slate-300 transition-colors"
             >
               Use a different email
             </button>
@@ -159,30 +161,32 @@ export default function DashboardSection({
 
         {step === 'subscribe' && (
           <div className="space-y-4">
-            <p className="text-sm text-orange-600">No active subscription found for <strong>{email}</strong>.</p>
+            <p className="text-sm text-orange-400">No active subscription found for <strong>{email}</strong>.</p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <SubscribeButton
                 playerTag={tag}
                 tier="pro"
                 label="Pro — $4.99/month"
-                className="flex-1 bg-blue-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm"
+                className="flex-1 text-white px-4 py-3 rounded-xl font-bold disabled:opacity-50 transition-all text-sm"
+                style={{ background: 'var(--blue)' }}
               />
               <SubscribeButton
                 playerTag={tag}
                 tier="elite"
                 label="Elite — $19.99/month"
-                className="flex-1 bg-purple-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-purple-700 disabled:opacity-50 transition-colors text-sm"
+                className="flex-1 text-white px-4 py-3 rounded-xl font-bold disabled:opacity-50 transition-all text-sm"
+                style={{ background: 'rgba(139,92,246,0.8)' }}
               />
             </div>
-            <div className="text-xs text-gray-400 space-y-1">
-              <p><strong>Pro:</strong> Full dashboard — deck win rates, loss patterns, card levels</p>
-              <p><strong>Elite:</strong> Pro + personal gameplay video review by a real player</p>
+            <div className="text-xs text-slate-500 space-y-1">
+              <p><strong className="text-slate-400">Pro:</strong> Full dashboard — deck win rates, loss patterns, card levels</p>
+              <p><strong className="text-slate-400">Elite:</strong> Pro + personal gameplay video review by a real player</p>
             </div>
           </div>
         )}
 
         {error && (
-          <p className="text-red-500 text-sm">{error}</p>
+          <p className="text-red-400 text-sm">{error}</p>
         )}
       </div>
     </div>

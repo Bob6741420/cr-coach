@@ -30,24 +30,28 @@ export default function TrophyChart({
   const max = Math.max(...vals)
   const pad = Math.max(30, Math.round((max - min) * 0.25))
   const trending = points[points.length - 1].trophies >= points[0].trophies
+  const lineColor = trending ? '#4ade80' : '#f87171'
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
+    <div className="card p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-bold text-gray-900">Trophy Trend</h2>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${trending ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Trophy Trend</h2>
+        <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{
+          background: trending ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
+          color: trending ? '#4ade80' : '#f87171',
+        }}>
           {trending ? '↑ Climbing' : '↓ Dropping'}
         </span>
       </div>
       <ResponsiveContainer width="100%" height={140}>
         <LineChart data={points} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-          <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#9ca3af' }} interval="preserveStartEnd" axisLine={false} tickLine={false} />
-          <YAxis domain={[min - pad, max + pad]} tick={{ fontSize: 10, fill: '#9ca3af' }} width={48} axisLine={false} tickLine={false} />
+          <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#475569' }} interval="preserveStartEnd" axisLine={false} tickLine={false} />
+          <YAxis domain={[min - pad, max + pad]} tick={{ fontSize: 10, fill: '#475569' }} width={48} axisLine={false} tickLine={false} />
           <Tooltip
             formatter={(v: unknown) => [Number(v).toLocaleString(), 'Trophies']}
-            contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
+            contentStyle={{ fontSize: 12, borderRadius: 10, background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}
           />
-          <Line type="monotone" dataKey="trophies" stroke={trending ? '#22c55e' : '#ef4444'} strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey="trophies" stroke={lineColor} strokeWidth={2} dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>

@@ -6,9 +6,10 @@ interface Props {
   tier: 'pro' | 'elite'
   label: string
   className?: string
+  style?: Record<string, string>
 }
 
-export default function SubscribeButton({ playerTag, tier, label, className }: Props) {
+export default function SubscribeButton({ playerTag, tier, label, className, style }: Props) {
   const [loading, setLoading] = useState(false)
 
   async function handleClick() {
@@ -27,6 +28,7 @@ export default function SubscribeButton({ playerTag, tier, label, className }: P
       onClick={handleClick}
       disabled={loading}
       className={className ?? 'bg-yellow-400 text-gray-900 px-6 py-3 rounded-xl font-bold hover:bg-yellow-300 disabled:opacity-50 transition-colors'}
+      style={style}
     >
       {loading ? 'Loading...' : label}
     </button>

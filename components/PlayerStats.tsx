@@ -1,21 +1,19 @@
 import type { CRPlayer } from '@/lib/clash-royale'
 
-export default function PlayerStats({ player }: { player: CRPlayer }) {
-  const winRate = Math.round((player.wins / Math.max(player.battleCount, 1)) * 100)
-
+export default function PlayerStats({ player, winRate }: { player: CRPlayer; winRate: number }) {
   const stats = [
-    { label: 'Trophies', value: player.trophies.toLocaleString() },
-    { label: 'Best', value: player.bestTrophies.toLocaleString() },
-    { label: 'Win Rate', value: `${winRate}%` },
-    { label: 'Battles', value: player.battleCount.toLocaleString() },
+    { label: 'Best Trophies', value: player.bestTrophies.toLocaleString(), accent: false },
+    { label: 'Win Rate', value: `${winRate}%`, accent: winRate >= 55 },
+    { label: 'Total Battles', value: player.battleCount.toLocaleString(), accent: false },
+    { label: 'Wins', value: player.wins.toLocaleString(), accent: false },
   ]
 
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-      {stats.map(({ label, value }) => (
-        <div key={label} className="bg-white rounded-xl p-4 shadow-sm text-center">
-          <p className="text-gray-400 text-xs uppercase tracking-wide">{label}</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+      {stats.map(({ label, value, accent }) => (
+        <div key={label} className="card card-hover p-4 text-center space-y-1">
+          <p className="text-slate-500 text-xs uppercase tracking-wide">{label}</p>
+          <p className={`text-xl font-bold ${accent ? 'text-green-400' : 'text-white'}`}>{value}</p>
         </div>
       ))}
     </div>
