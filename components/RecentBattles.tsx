@@ -15,10 +15,7 @@ export default function RecentBattles({ battles, tag }: { battles: BattleLogEntr
       <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-4">Recent Battles</h2>
       <div className="space-y-1">
         {recent.map((b, i) => (
-          <div key={i} className="flex items-center gap-3 py-1.5 rounded-lg px-2 transition-colors" style={{ borderRadius: 8 }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-          >
+          <div key={i} className="flex items-center gap-3 py-1.5 px-2 rounded-lg transition-colors hover:bg-white/[0.03]">
             <span className="text-xs font-bold px-2 py-0.5 rounded-md shrink-0 w-12 text-center" style={{
               background: b.won ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
               color: b.won ? '#4ade80' : '#f87171',
