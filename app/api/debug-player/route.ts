@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchPlayer } from '@/lib/clash-royale'
+import { formatTag } from '@/lib/clash-royale'
 
 export async function GET(req: NextRequest) {
   const tag = req.nextUrl.searchParams.get('tag') ?? '20G8R2VGPY'
-  const player = await fetchPlayer(tag) as Record<string, unknown>
+  const res = await fetch(
+    `https://api.clashroyale.com/v1/players/${encodeURIComponent(formatTag(tag))}`,
+    { headers: { Authorization: `Bearer ${process.env.CLASH_ROYALE_API_KEY}` } }
+  )
+  const raw = await res.json()
   return NextResponse.json({
-    deckCards: (player.currentDeck as Array<Record<string, unknown>>)?.map(c => ({
-      name: c.name,
-      evolutionLevel: c.evolutionLevel,
-      iconUrls: c.iconUrls,
-    })),
-    supportCards: (player.currentDeckSupportCards as Array<Record<string, unknown>>)?.map(c => ({
-      name: c.name,
-      evolutionLevel: c.evolutionLevel,
-      iconUrls: c.iconUrls,
-    })),
+    keys: Object.keys(raw),
+    currentDeck: raw.currentDeck?.map((c: Record<string, unknown>) => ({ name: c.name, evolutionLevel: c.evolutionLevel, iconUrls: c.iconUrls })),
+    supportCards: raw.currentDeckSupportCards?.map((c: Record<string, unknown>) => ({ name: c.name, evolutionLevel: c.evolutionLevel, iconUrls: c.iconUrls })),
+    allSupportRaw: raw.currentDeckSupportCards,
   })
 }
